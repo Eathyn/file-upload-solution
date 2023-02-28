@@ -1,19 +1,21 @@
-# solution-file-upload
+# File Upload
 
-## Project setup
+## Project Setup
 ```
 npm install
 ```
 
-### Compiles and hot-reloads for development
+## Start Front End Project
 ```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
+npm run start-fe
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## Start Back End Project
+```
+npm run start-be
+```
+
+## Format Code Style
+```
+npm run lint
+```
