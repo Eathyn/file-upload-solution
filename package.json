@@ -5,7 +5,14 @@
   "scripts": {
     "start-fe": "vue-cli-service serve",
     "start-be": "nodemon server/index.js",
-    "build": "vue-cli-service build"
+    "build": "vue-cli-service build",
+    "lint": "lint-staged"
+  },
+  "lint-staged": {
+    "**/*.{vue,js,html}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "core-js": "^3.8.3",
@@ -25,6 +32,7 @@
     "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-vue": "^9.9.0",
     "fs-extra": "^11.1.0",
+    "lint-staged": "^13.1.2",
     "multiparty": "^4.2.3",
     "nodemon": "^2.0.20",
     "prettier": "^2.8.4",
