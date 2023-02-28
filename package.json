@@ -16,9 +16,18 @@
     "@types/fs-extra": "^11.0.1",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
+    "eslint": "^8.35.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^15.6.1",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-vue": "^9.9.0",
     "fs-extra": "^11.1.0",
     "multiparty": "^4.2.3",
     "nodemon": "^2.0.20",
+    "prettier": "^2.8.4",
     "spark-md5": "^3.0.2"
   }
 }

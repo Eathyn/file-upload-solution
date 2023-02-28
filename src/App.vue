@@ -5,8 +5,18 @@
       :disabled="status !== Status.wait"
       @change="handleFileChange"
     />
-    <el-button @click="handleUpload" :disabled="uploadDisabled">upload</el-button>
-    <el-button @click="handleResume" v-if="status === Status.pause">resume</el-button>
+    <el-button
+      @click="handleUpload"
+      :disabled="uploadDisabled"
+    >
+      upload
+    </el-button>
+    <el-button
+      @click="handleResume"
+      v-if="status === Status.pause"
+    >
+      resume
+    </el-button>
     <el-button
       v-else
       :disabled="status !== Status.uploading || !container.hash"
@@ -32,12 +42,19 @@
       label="chunk hash"
       align="center"
     />
-    <el-table-column label="size(KB)" align="center" width="120">
+    <el-table-column
+      label="size(KB)"
+      align="center"
+      width="120"
+    >
       <template v-slot="{ row }">
         {{ transformByte(row.size) }}
       </template>
     </el-table-column>
-    <el-table-column label="percentage" align="center">
+    <el-table-column
+      label="percentage"
+      align="center"
+    >
       <template v-slot="{ row }">
         <el-progress
           :percentage="row.percentage"
@@ -55,19 +72,19 @@ import asyncPool from '@/utils/async-pool'
 const SIZE = 5 * 1024 * 1024
 
 const Status = {
-  wait: "wait",
-  pause: "pause",
-  uploading: "uploading"
+  wait: 'wait',
+  pause: 'pause',
+  uploading: 'uploading',
 }
 
 export default {
-  name: "app",
+  name: 'app',
   data: () => ({
     Status,
     container: {
       file: null,
-      hash: "",
-      worker: null
+      hash: '',
+      worker: null,
     },
     hashPercentage: 0,
     data: [],
@@ -84,8 +101,8 @@ export default {
     uploadPercentage() {
       if (!this.container.file || !this.data.length) return 0
       const loaded = this.data
-      .map(item => item.size * item.percentage)
-      .reduce((acc, cur) => acc + cur)
+        .map((item) => item.size * item.percentage)
+        .reduce((acc, cur) => acc + cur)
       return parseInt((loaded / this.container.file.size).toFixed(2))
     },
   },
@@ -96,29 +113,29 @@ export default {
 
     request({
       url,
-      method = "post",
+      method = 'post',
       data,
       headers = {},
-      onProgress = e => e,
-      requestList
+      onProgress = (e) => e,
+      requestList,
     }) {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         const xhr = new XMLHttpRequest()
         xhr.upload.onprogress = onProgress
         xhr.open(method, url)
-        Object.keys(headers).forEach(key =>
-          xhr.setRequestHeader(key, headers[key])
+        Object.keys(headers).forEach((key) =>
+          xhr.setRequestHeader(key, headers[key]),
         )
         xhr.send(data)
-        xhr.onload = e => {
+        xhr.onload = (e) => {
           // 将请求成功的 xhr 从列表中删除
           // remove xhr which status is success
           if (requestList) {
-            const xhrIndex = requestList.findIndex(item => item === xhr)
+            const xhrIndex = requestList.findIndex((item) => item === xhr)
             requestList.splice(xhrIndex, 1)
           }
           resolve({
-            data: e.target.response
+            data: e.target.response,
           })
         }
         // 暴露当前 xhr 给外部
@@ -129,10 +146,10 @@ export default {
 
     async handleDelete() {
       const { data } = await this.request({
-        url: "http://localhost:3000/delete"
+        url: 'http://localhost:3000/delete',
       })
       if (JSON.parse(data).code === 0) {
-        this.$message.success("delete success")
+        this.$message.success('delete success')
       }
     },
 
@@ -142,7 +159,7 @@ export default {
     },
 
     resetData() {
-      this.requestList.forEach(xhr => xhr?.abort())
+      this.requestList.forEach((xhr) => xhr?.abort())
       this.requestList = []
       if (this.container.worker) {
         this.container.worker.onmessage = null
@@ -153,7 +170,7 @@ export default {
       this.status = Status.uploading
       const { uploadedList } = await this.verifyUpload(
         this.container.file.name,
-        this.container.hash
+        this.container.hash,
       )
       await this.uploadChunks(uploadedList)
     },
@@ -173,10 +190,10 @@ export default {
     // 生成文件 hash（web-worker）
     // use web-worker to calculate hash
     calculateHash(fileChunkList) {
-      return new Promise(resolve => {
-        this.container.worker = new Worker("/hash.js")
+      return new Promise((resolve) => {
+        this.container.worker = new Worker('/hash.js')
         this.container.worker.postMessage({ fileChunkList })
-        this.container.worker.onmessage = e => {
+        this.container.worker.onmessage = (e) => {
           const { percentage, hash } = e.data
           this.hashPercentage = percentage
           if (hash) {
@@ -203,10 +220,12 @@ export default {
       // uploadedList: 一个包含已上传的切片的索引，格式为 `文件哈希-切片索引`
       const { shouldUpload, uploadedList } = await this.verifyUpload(
         this.container.file.name,
-        this.container.hash
+        this.container.hash,
       )
       if (!shouldUpload) {
-        this.$message.success("skip upload：file upload success, check /target directory")
+        this.$message.success(
+          'skip upload：file upload success, check /target directory',
+        )
         this.status = Status.wait
         return
       }
@@ -214,10 +233,12 @@ export default {
       this.data = fileChunkList.map(({ file }, index) => ({
         fileHash: this.container.hash,
         index,
-        hash: this.container.hash + "-" + index,
+        hash: this.container.hash + '-' + index,
         chunk: file,
         size: file.size,
-        percentage: uploadedList.includes(`${this.container.hash}-${index}`) ? 100 : 0
+        percentage: uploadedList.includes(`${this.container.hash}-${index}`)
+          ? 100
+          : 0,
       }))
       await this.uploadChunks(uploadedList)
     },
@@ -226,25 +247,25 @@ export default {
     // upload chunks and filter uploaded chunks
     async uploadChunks(uploadedList = []) {
       const dataList = this.data
-      .filter(({ hash }) => !uploadedList.includes(hash))
-      .map(({ chunk, hash, index }) => {
-        const formData = new FormData()
-        formData.append("chunk", chunk)
-        formData.append("hash", hash)
-        formData.append("filename", this.container.file.name)
-        formData.append("fileHash", this.container.hash)
-        return { formData, index }
-      })
+        .filter(({ hash }) => !uploadedList.includes(hash))
+        .map(({ chunk, hash, index }) => {
+          const formData = new FormData()
+          formData.append('chunk', chunk)
+          formData.append('hash', hash)
+          formData.append('filename', this.container.file.name)
+          formData.append('fileHash', this.container.hash)
+          return { formData, index }
+        })
 
       // 并发控制
       // concurrence control
       const requestList = await asyncPool(3, dataList, (item) => {
         const { formData, index } = item
         return this.request({
-          url: "http://localhost:3000",
+          url: 'http://localhost:3000',
           data: formData,
           onProgress: this.createProgressHandler(this.data[index]),
-          requestList: this.requestList
+          requestList: this.requestList,
         })
       })
 
@@ -261,17 +282,17 @@ export default {
     // notify server to merge chunks
     async mergeRequest() {
       await this.request({
-        url: "http://localhost:3000/merge",
+        url: 'http://localhost:3000/merge',
         headers: {
-          "content-type": "application/json"
+          'content-type': 'application/json',
         },
         data: JSON.stringify({
           size: SIZE,
           fileHash: this.container.hash,
-          filename: this.container.file.name
-        })
+          filename: this.container.file.name,
+        }),
       })
-      this.$message.success("upload success, check /target directory")
+      this.$message.success('upload success, check /target directory')
       this.status = Status.wait
     },
 
@@ -281,14 +302,14 @@ export default {
     // skip if uploaded
     async verifyUpload(filename, fileHash) {
       const { data } = await this.request({
-        url: "http://localhost:3000/verify",
+        url: 'http://localhost:3000/verify',
         headers: {
-          "content-type": "application/json"
+          'content-type': 'application/json',
         },
         data: JSON.stringify({
           filename,
-          fileHash
-        })
+          fileHash,
+        }),
       })
       return JSON.parse(data)
     },
@@ -296,7 +317,7 @@ export default {
     // 用闭包保存每个 chunk 的进度数据
     // use closures to save progress data for each chunk
     createProgressHandler(item) {
-      return e => {
+      return (e) => {
         item.percentage = parseInt(String((e.loaded / e.total) * 100))
       }
     },
