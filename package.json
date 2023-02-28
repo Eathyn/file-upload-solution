@@ -3,15 +3,22 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "start-fe": "vue-cli-service serve",
+    "start-be": "nodemon server/index.js",
     "build": "vue-cli-service build"
   },
   "dependencies": {
     "core-js": "^3.8.3",
+    "element-plus": "^2.2.32",
     "vue": "^3.2.13"
   },
   "devDependencies": {
+    "@types/fs-extra": "^11.0.1",
     "@vue/cli-plugin-babel": "~5.0.0",
-    "@vue/cli-service": "~5.0.0"
+    "@vue/cli-service": "~5.0.0",
+    "fs-extra": "^11.1.0",
+    "multiparty": "^4.2.3",
+    "nodemon": "^2.0.20",
+    "spark-md5": "^3.0.2"
   }
 }
